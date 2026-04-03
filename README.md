@@ -1,16 +1,18 @@
 # Bottom Gun Play ✈️
 
-An 8-bit themed Flight Simulator built with Three.js.
+A high-performance Flight Simulator built with Three.js.
 
-## 🚀 Play Online
-Enjoy the mission directly from your browser!
-[Play Now](https://rajatsinhaofficial94-crypto.github.io/BottomGunPlay/)
+## 🎮 Play Online Now!
+### **[>>> CLICK HERE TO PLAY THE MISSION <<<](https://rajatsinhaofficial94-crypto.github.io/BottomGunPlay/)**
+
+---
 
 ## 🛠 Features
-- **Dynamic Physics**: Realistic 8-bit flight dynamics.
+- **Dynamic Physics**: Realistic flight dynamics and controls.
 - **Combat HUD**: Tactical radar, health bars, and ammo tracking.
 - **Customization**: Upload your own high-res custom liveries.
 - **Missions**: Neutralize hostiles and navigate through complex environments.
+
 
 ## 🕹 Controls
 - **W / S**: Pitch Down / Up
