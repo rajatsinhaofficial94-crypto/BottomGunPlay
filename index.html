@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Bit Flight Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* background-color: #000; REMOVED FOR DEBUGGING */
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            font-family: 'Courier New', Courier, monospace;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+            z-index: 10;
+        }
+
+        .hud-element {
+            position: absolute;
+            padding: 10px;
+        }
+
+        #speed {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        #altitude {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        #heading {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #instructions {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border: 2px solid #0f0;
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        #customize-btn {
+            display: inline-block;
+            margin: 15px auto 5px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
+            border: none;
+            color: #ffd700;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        #customize-btn:hover {
+            background: linear-gradient(135deg, #2a2a5e, #3a3a7e);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        #customize-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        #customize-panel .panel-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 30, 0.95);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 30px 40px;
+            width: 380px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+        }
+
+        #customize-panel h2 {
+            margin: 0 0 20px 0;
+            color: #ffd700;
+            font-size: 1.4em;
+            text-align: center;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 12px;
+        }
+
+        #customize-panel .control-group {
+            margin-bottom: 18px;
+        }
+
+        #customize-panel label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #customize-panel .skin-upload-label {
+            display: block;
+            padding: 12px;
+            background: #1a1a3e;
+            border: 1px solid #555;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            color: #ccc;
+            transition: all 0.2s;
+        }
+
+        #customize-panel .skin-upload-label:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        #customize-panel .color-input {
+            width: 100%;
+            height: 45px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #1a1a3e;
+        }
+
+        .panel-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            background: #1a1a3e;
+            color: #ccc;
+        }
+
+        .panel-btn:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .panel-btn-done {
+            background: linear-gradient(135deg, #1a3e1a, #2a5e2a);
+            border-color: #0f0;
+            color: #0f0;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .panel-btn-done:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .panel-status {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #888;
+            text-align: center;
+            min-height: 1.2em;
+        }
+
+        #cockpit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* Allow interaction with elements behind it */
+            z-index: 100;
+            /* Ensure it's on top of other game elements */
+        }
+
+        #cockpit-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Cover the entire container */
+            image-rendering: pixelated;
+            /* Maintain pixelated look */
+        }
+
+        #combat-hud {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            pointer-events: none;
+            z-index: 15;
+            filter: drop-shadow(0 0 4px #00ffff);
+        }
+
+        .hud-ring {
+            fill: none;
+            stroke: rgba(0, 255, 255, 0.6);
+            stroke-width: 1.5;
+            stroke-dasharray: 4, 12;
+            animation: rotate-slow 20s linear infinite;
+        }
+
+        .hud-pipper {
+            fill: #00ffff;
+        }
+
+        .hud-funnel,
+        .hud-line {
+            fill: none;
+            stroke: rgba(0, 255, 255, 0.8);
+            stroke-width: 1;
+        }
+
+        .hud-funnel {
+            stroke-dasharray: 2, 4;
+        }
+
+        @keyframes rotate-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Firing Vibration Class */
+        .hud-vibrate {
+            animation: vibrate 0.05s linear infinite;
+            filter: drop-shadow(0 0 10px #ff00ff) !important;
+        }
+
+        /* Tactical Radar */
+        #radar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            /* Offset to clear altitude text */
+            width: 220px;
+            height: 220px;
+            background: rgba(0, 40, 0, 0.6);
+            border: 2px solid #0f0;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            overflow: hidden;
+        }
+
+        #radar-sweep {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, rgba(0, 255, 0, 0.3) 0deg, transparent 90deg);
+            border-radius: 50%;
+            animation: sweep 3s linear infinite;
+        }
+
+        @keyframes sweep {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .radar-blip {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #0f0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 4px #0f0;
+        }
+
+        .radar-blip.airship {
+            background: #ff0;
+            box-shadow: 0 0 6px #ff0;
+            width: 8px;
+            height: 8px;
+        }
+
+        #radar-arc {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 220px;
+            height: 220px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 5;
+            /* Arc from -30deg to +30deg (60deg fov) represented as conic-gradient */
+            background: conic-gradient(from -30deg, rgba(0, 255, 0, 0.4) 0deg, rgba(0, 255, 0, 0.4) 60deg, transparent 60deg);
+            pointer-events: none;
+        }
+
+        #radar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* Kill Counter */
+        #kill-counter {
+            top: 20px;
+            left: 20px;
+            font-size: 1.2em;
+            color: #ff3300;
+            text-shadow: 0 0 10px #ff3300;
+            font-weight: bold;
+        }
+
+        /* Model Credits Styling */
+        .model-credits {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+            text-align: left;
+            font-size: 11px;
+            color: #8f8;
+            max-width: 400px;
+        }
+
+        .model-credits summary {
+            margin: 0 0 5px 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #0f0;
+            text-decoration: underline;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .model-credits p {
+            margin: 4px 0;
+            line-height: 1.3;
+        }
+
+        .model-credits a {
+            color: #0ff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Game Intro Video Overlay -->
+    <div id="intro-video-container"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; background: black;">
+        <video id="intro-video" style="width: 100%; height: 100%; object-fit: contain;"
+            src="src/assets/gameintseq.mov"></video>
+        <div id="skip-notifier"
+            style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255, 0, 0, 0.7); font-family: 'Courier New', monospace; font-size: 24px; text-shadow: 0 0 10px #000;">
+            Press "S" to skip
+        </div>
+    </div>
+
+    <div id="game-container">
+        <!-- Cockpit Overlay -->
+        <div id="cockpit-overlay" style="display: none;">
+            <!-- Image removed for clean First-Person view -->
+        </div>
+
+        <!-- HUD -->
+        <div id="ui-container">
+            <div id="kill-counter" class="hud-element">HOSTILES: 15</div>
+            <div id="speed" class="hud-element">SPD: 0 kph</div>
+            <div id="throttle" class="hud-element" style="bottom: 50px; left: 20px;">THR: 0%</div>
+            <div id="pizza-meter" class="hud-element"
+                style="top: 60px; left: 50%; transform: translateX(-50%); font-size: 2em; text-shadow: 0 0 10px #ff8800; filter: drop-shadow(0 0 5px #ff8800);">
+                🍕🍕🍕</div>
+            <div id="altitude" class="hud-element" style="bottom: 80px; left: 20px;">ALT: 0</div>
+            <div id="heading" class="hud-element">HDG: 000</div>
+
+            <!-- Health Bar -->
+            <div id="health-bar-container" class="hud-element"
+                style="top: 20px; right: 20px; width: 200px; height: 20px; border: 2px solid #0f0; background: rgba(0, 40, 0, 0.6); text-align: center; line-height: 20px;">
+                <div id="health-fill"
+                    style="width: 100%; height: 100%; background: #0f0; transition: width 0.2s; position: absolute; top: 0; left: 0; z-index: 0;">
+                </div>
+                <span id="health-text"
+                    style="position: relative; z-index: 1; color: #fff; font-size: 14px; font-weight: bold; text-shadow: 1px 1px 2px #000;">100%</span>
+            </div>
+
+            <!-- Ammo Meter -->
+            <div id="ammo" class="hud-element"
+                style="top: 60px; right: 20px; font-size: 1.2em; font-weight: bold; text-align: right; width: 200px;">
+                AMMO: 250</div>
+
+            <!-- Tactical Radar -->
+            <div id="radar">
+                <div id="radar-sweep"></div>
+                <div id="radar-arc"></div>
+                <div id="radar-center"></div>
+                <div id="radar-blips"></div>
+            </div>
+
+            <!-- Advanced Combat HUD -->
+            <div id="combat-hud">
+                <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+                    <!-- Precision Pipper -->
+                    <circle cx="100" cy="100" r="1.5" class="hud-pipper" />
+                    <!-- Lead/Funnel Guides -->
+                    <path d="M 85 140 L 98 105" class="hud-funnel" />
+                    <path d="M 115 140 L 102 105" class="hud-funnel" />
+                    <!-- Horizontal Stabilization Bars -->
+                    <line x1="60" y1="100" x2="80" y2="100" class="hud-line" />
+                    <line x1="120" y1="100" x2="140" y2="100" class="hud-line" />
+                </svg>
+            </div>
+
+            <!-- Artificial Horizon -->
+            <div id="attitude-indicator">
+                <div id="horizon-instrument">
+                    <div id="horizon-sky"></div>
+                    <div id="horizon-ground"></div>
+                    <div id="horizon-line"></div>
+                </div>
+                <div id="attitude-bezel"></div>
+                <div id="attitude-wings"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Panel - OUTSIDE ui-container for proper z-index and clickability -->
+    <!-- Instructions Panel - OUTSIDE ui-container for proper z-index and clickability -->
+    <div id="instructions">
+        <img id="game-logo" src="src/assets/logo.png" alt="Bottom Gun Logo">
+        <h1>8-BIT FLIGHT SIM</h1>
+        <details class="controls-details" onclick="event.stopPropagation();">
+            <summary>View Flight Controls</summary>
+            <div class="controls-content">
+                <div class="control-item"><span>W / Arrow Up</span><span>Pitch Down</span></div>
+                <div class="control-item"><span>S / Arrow Down</span><span>Pitch Up</span></div>
+                <div class="control-item"><span>A / D or L/R Arrows</span><span>Roll & Yaw</span></div>
+                <div class="control-item"><span>Shift / Ctrl</span><span>Throttle Up / Down</span></div>
+                <div class="control-item"><span>Spacebar</span><span>Fire Cannon</span></div>
+                <div class="control-item"><span>C</span><span>Cycle View Mode</span></div>
+                <div class="control-item"><span>Mouse Wheel</span><span>Zoom / Adjust FOV</span></div>
+                <div class="control-item"><span>P</span><span>Deploy Pizza 🍕</span></div>
+            </div>
+        </details>
+        <button id="customize-btn"
+            onclick="event.stopPropagation(); document.getElementById('customize-panel').style.display='block';">✈
+            CUSTOMIZE AIRCRAFT</button>
+        <p style="margin-top: 15px; font-size: 1.2em;">&gt;&gt;&gt; Click to Start &lt;&lt;&lt;</p>
+
+        <!-- Credits Footer -->
+        <details class="model-credits" onclick="event.stopPropagation();">
+            <summary>Model & Audio Credits</summary>
+            <div style="margin-top: 10px;">
+                <p>Trump - <a href="https://skfb.ly/6UKnv" target="_blank">"Donald Trump Running"</a> by Vadim Fedenko is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+                <p>Temple - <a href="https://skfb.ly/6SHT7" target="_blank">"Jeffrey Epstein Little St James Temple"</a> by Lex Villena is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+                <p>File folder - <a href="https://skfb.ly/pxQUI" target="_blank">"document_file_folder (2)"</a> by ap-school is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution</a>.</p>
+                <p><a href="https://skfb.ly/6DGT6" target="_blank">"Pizza"</a> by Jeremy E. Grayson is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution</a>.</p>
+                <p>Run Amok by Kevin MacLeod | <a href="https://incompetech.com/" target="_blank">https://incompetech.com/</a></p>
+                <p>Music promoted by <a href="https://www.chosic.com/free-music/all/" target="_blank">https://www.chosic.com/free-music/all/</a></p>
+                <p>Creative Commons CC BY 3.0 <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">https://creativecommons.org/licenses/by/3.0/</a></p>
+            </div>
+        </details>
+    </div>
+
+    <!-- Aircraft Customization Panel -->
+    <div id="customize-panel" onclick="event.stopPropagation();">
+        <div class="panel-inner">
+            <h2>✈ AIRCRAFT CUSTOMIZATION</h2>
+
+            <div class="control-group">
+                <label>Custom Skin</label>
+                <label for="skin-upload-input" class="skin-upload-label">
+                    <span id="skin-upload-text">📁 Choose Image (PNG/JPG)...</span>
+                </label>
+                <input id="skin-upload-input" type="file" accept="image/*" style="display:none;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px;">
+                    <div class="panel-status" id="skin-status" style="margin-top: 0; min-height: auto;"></div>
+                    <button id="remove-skin-btn"
+                        style="background: none; border: none; color: #ff3333; cursor: pointer; font-size: 1.2em; display: none; padding: 0;"
+                        title="Remove Custom Skin">❌</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Solid Color</label>
+                <input type="color" id="aircraft-color-picker" class="color-input" value="#888888">
+            </div>
+
+            <div class="control-group" style="text-align: center;">
+                <button class="panel-btn" id="reset-appearance-btn">↺ Reset to Default</button>
+            </div>
+
+            <button class="panel-btn panel-btn-done" id="customize-done-btn">✓ DONE</button>
+        </div>
+    </div>
+
+    <!-- Victory Cinematic Overlay (Hidden until triggered) -->
+    <div id="victory-text"
+        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Impact', sans-serif; font-size: 120px; color: #ffd700; text-shadow: 0 0 20px #ffaa00, 0 0 40px #ff0000; opacity: 0; transition: opacity 2s ease-in; pointer-events: none; text-align: center; letter-spacing: 10px; z-index: 200; display: none;">
+        MISSION ACCOMPLISHED
+        <div
+            style="font-size: 40px; color: #ffffff; margin-top: 20px; text-shadow: 0 0 10px #000; font-family: 'Courier New', monospace;">
+            HOSTILES NEUTRALIZED</div>
+    </div>
+
+    <div id="game-over"
+        style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: red; font-size: 40px; text-shadow: 2px 2px #000; z-index: 50;">
+        GAME OVER<br><span style="font-size: 20px; color: white;">Reload to restart</span>
+    </div>
+    <!-- Error Logger -->
+    <div id="error-console"
+        style="position: fixed; top: 0; left: 0; background: rgba(255,0,0,0.8); color: white; padding: 20px; z-index: 9999; display: none; font-family: monospace; white-space: pre-wrap;">
+    </div>
+    <script>
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            const container = document.getElementById('error-console');
+            container.style.display = 'block';
+            container.innerHTML += `Release the Kraken! Error: ${msg}\nURL: ${url}\nLine: ${lineNo}\n\n`;
+            return false;
+        };
+        window.addEventListener('unhandledrejection', event => {
+            const container = document.getElementById('error-console');
+            container.style.display = 'block';
+            container.innerHTML += `Promise Rejection: ${event.reason}\n\n`;
+        });
+    </script>
+
+    <!-- ES Module Support with Import Map -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./src/lib/three.module.js"
+            }
+        }
+    </script>
+    <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
