@@ -1,0 +1,19 @@
+{
+  "name": "bottomgun2",
+  "version": "1.0.0",
+  "main": "main_electron.js",
+  "scripts": {
+    "start": "electron .",
+    "predeploy": "echo 'Preparing for deployment...'",
+    "deploy": "gh-pages -d ."
+  },
+  "dependencies": {
+    "lil-gui": "^0.21.0",
+    "sharp": "^0.34.5",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "gh-pages": "^6.0.0"
+  }
+}

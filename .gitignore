@@ -1,0 +1,15 @@
+# .gitignore for Bottom Gun Play Source
+node_modules/
+dist/
+build/
+.DS_Store
+Thumbs.db
+*.exe
+*.dll
+*.pak
+*.bin
+*.dat
+
+# Large individual built binaries should remain in .gitignore (the ones found in root), 
+# but game assets in src/assets/ must be tracked.
+
