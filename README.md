@@ -22,6 +22,7 @@ A high-performance Flight Simulator built with Three.js.
 - **Spacebar**: Fire Cannon
 - **P**: Deploy Pizza 🍕
 - **C**: Toggle Camera View
+- **Easter Egg**: See a box floating mid air? Shoot it and find out!
 
 ## 📦 How to Run Locally
 1. Clone the repository.
