@@ -2,7 +2,7 @@
 
 A Brain-Rot Flight Simulator I vibe coded myself using Antigravity.
 
-## 🎮 Play Online Now!
+## 🎮 Play Online Now! (ONLY PC)
 ### **[>>> CLICK HERE TO PLAY THE MISSION <<<](https://rajatsinhaofficial94-crypto.github.io/BottomGunPlay/)**
 
 ---
