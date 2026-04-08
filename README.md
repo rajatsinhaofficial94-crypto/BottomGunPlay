@@ -1,6 +1,6 @@
 # Bottom Gun Play ✈️
 
-A high-performance Flight Simulator built with Three.js.
+A brain rot Flight Simulator built I vibe coded myself using Antigravity.
 
 ## 🎮 Play Online Now!
 ### **[>>> CLICK HERE TO PLAY THE MISSION <<<](https://rajatsinhaofficial94-crypto.github.io/BottomGunPlay/)**
@@ -12,7 +12,6 @@ A high-performance Flight Simulator built with Three.js.
 - **Combat HUD**: Tactical radar, health bars, and ammo tracking.
 - **Customization**: Upload your own high-res custom liveries.
 - **Missions**: Neutralize hostiles and navigate through complex environments.
-
 
 ## 🕹 Controls
 - **W / S, Up / Down**: Pitch Down / Up
@@ -28,5 +27,8 @@ A high-performance Flight Simulator built with Three.js.
 1. Clone the repository.
 2. Open `index.html` in a web browser (preferably through a local server like Live Server or `npm start`).
 
+## Make it your own!
+1. Dive into the code and make your own changes. Worsen the Brain Rot!
+2. Please give me credits :p
 ---
 *Created by Rajat Sinha*
