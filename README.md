@@ -1,6 +1,6 @@
 # Bottom Gun Play ✈️
 
-A brain rot Flight Simulator built I vibe coded myself using Antigravity.
+A Brain-Rot Flight Simulator I vibe coded myself using Antigravity.
 
 ## 🎮 Play Online Now!
 ### **[>>> CLICK HERE TO PLAY THE MISSION <<<](https://rajatsinhaofficial94-crypto.github.io/BottomGunPlay/)**
