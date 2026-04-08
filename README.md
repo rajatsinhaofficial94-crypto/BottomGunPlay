@@ -27,8 +27,10 @@ A brain rot Flight Simulator built I vibe coded myself using Antigravity.
 1. Clone the repository.
 2. Open `index.html` in a web browser (preferably through a local server like Live Server or `npm start`).
 
-## Make it your own!
-1. Dive into the code and make your own changes. Worsen the Brain Rot!
+## 🪄 Give it your personal touch
+1. Dive into the code and make your own changes. Worsen the Brain Rot! 
 2. Please give me credits :p
----
+   
+--- 
+
 *Created by Rajat Sinha*
