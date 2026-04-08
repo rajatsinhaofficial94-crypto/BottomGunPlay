@@ -15,8 +15,9 @@ A high-performance Flight Simulator built with Three.js.
 
 
 ## 🕹 Controls
-- **W / S**: Pitch Down / Up
-- **A / D**: Roll & Yaw
+- **W / S, Up / Down**: Pitch Down / Up
+- **Left / Right**: Roll Right / Left
+- **A / D**: Yaw Right / Left
 - **Shift / Ctrl**: Throttle Up / Down
 - **Spacebar**: Fire Cannon
 - **P**: Deploy Pizza 🍕
