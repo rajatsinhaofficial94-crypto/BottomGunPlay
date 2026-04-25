@@ -1,4 +1,4 @@
-# Bottom Gun Play ✈️
+# PC ONLY GAME - Bottom Gun ✈️
 
 A Brain-Rot Flight Simulator I vibe coded myself using Antigravity.
 
